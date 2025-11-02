@@ -1,0 +1,474 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Job Application Submission</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --color-bg-primary: linear-gradient(135deg, #0a0a0a 0%, #1a1a2e 50%, #16213e 100%);
+            --color-bg-container: rgba(30, 30, 30, 0.75);
+            --color-text-primary: #e0e0e0;
+            --color-input-bg: #333;
+            --color-border: #555;
+            --color-accent-gradient: linear-gradient(90deg, #00bfa6, #00d4d8);
+            --color-shadow: rgba(0, 0, 0, 0.4);
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            margin: 0;
+            padding: 20px;
+            background: var(--color-bg-primary);
+            color: var(--color-text-primary);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .container {
+            background: var(--color-bg-container);
+            backdrop-filter: blur(8px);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            border-radius: 20px;
+            padding: 40px;
+            max-width: 700px;
+            width: 100%;
+            box-shadow: 0 8px 32px var(--color-shadow);
+            position: relative;
+            overflow: hidden;
+        }
+
+        h2 {
+            text-align: center;
+            color: var(--color-text-primary);
+            font-weight: 600;
+            margin-bottom: 30px;
+            font-size: 1.75rem;
+        }
+
+        .form-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-group.full-width {
+            grid-column: 1 / -1;
+        }
+
+        .optional {
+            color: #888;
+            font-weight: 400;
+            font-size: 0.8em;
+        }
+
+        .validation-error {
+            display: none;
+            color: #e74c3c;
+            font-size: 0.8em;
+            margin-top: 4px;
+        }
+
+        .invalid {
+            border-color: #e74c3c !important;
+        }
+
+        .section-title {
+            grid-column: 1 / -1;
+            margin: 30px 0 10px;
+            color: #00d4d8;
+            font-weight: 600;
+            border-bottom: 1px solid #333;
+            padding-bottom: 4px;
+        }
+
+        .tooltip {
+            cursor: help;
+            font-size: 0.85em;
+            opacity: 0.6;
+            margin-left: 8px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 500;
+            color: var(--color-text-primary);
+            font-size: 0.875rem;
+        }
+
+        input[type="text"], input[type="date"], input[type="url"], select, textarea {
+            width: 100%;
+            padding: 12px 16px;
+            background-color: var(--color-input-bg);
+            border: 1px solid var(--color-border);
+            border-radius: 6px;
+            color: var(--color-text-primary);
+            font-size: 1rem;
+            transition: border-color 0.2s ease, box-shadow 0.2s ease;
+            box-sizing: border-box;
+        }
+
+        input[type="text"]:focus, input[type="date"]:focus, select:focus, textarea:focus {
+            border-color: #00d4d8;
+            box-shadow: 0 0 8px rgba(0, 212, 216, 0.3);
+            outline: none;
+        }
+
+        select {
+            appearance: none;
+            background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23e0e0e0' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6,9 12,15 18,9'%3e%3c/polyline%3e%3c/svg%3e");
+            background-repeat: no-repeat;
+            background-position: right 12px center;
+            background-size: 16px;
+            padding-right: 40px;
+        }
+
+        textarea {
+            resize: vertical;
+            min-height: 100px;
+        }
+
+        .applicant-select {
+            background-color: var(--color-bg-container);
+            padding: 20px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            border: 1px dashed var(--color-border);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 20px;
+        }
+
+        .applicant-select label {
+            font-weight: 400;
+            color: var(--color-text-primary);
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .applicant-select input[type="radio"] {
+            accent-color: var(--color-accent);
+        }
+
+        button {
+            background: var(--color-accent-gradient);
+            color: #ffffff;
+            padding: 14px 24px;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 1rem;
+            font-weight: 500;
+            width: 100%;
+            transition: filter 0.2s ease, transform 0.2s ease;
+        }
+
+        button:hover {
+            filter: brightness(1.1);
+            transform: translateY(-2px);
+        }
+
+        button:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .message {
+            margin-top: 20px;
+            padding: 12px 16px;
+            border-radius: 6px;
+            display: none;
+            text-align: center;
+            font-weight: 500;
+            transition: all 0.4s ease-in-out;
+            opacity: 0;
+        }
+
+        .message.show {
+            display: block;
+            opacity: 1;
+        }
+
+        #progressBar {
+            height: 4px;
+            width: 0;
+            background: var(--color-accent-gradient);
+            border-radius: 4px;
+            transition: width 0.5s ease;
+            margin-bottom: 10px;
+        }
+
+        .spinner {
+            width: 18px;
+            height: 18px;
+            border: 3px solid #008080;
+            border-top: 3px solid transparent;
+            border-radius: 50%;
+            display: inline-block;
+            animation: spin 0.8s linear infinite;
+            margin-left: 8px;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        .success {
+            background-color: #1e3a29;
+            color: #38c172;
+            border: 1px solid #2d5a3d;
+        }
+
+        .error {
+            background-color: #3a1e1e;
+            color: #e74c3c;
+            border: 1px solid #5a2d2d;
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                padding: 20px;
+                margin: 10px;
+            }
+            h2 {
+                font-size: 1.5rem;
+            }
+            .applicant-select {
+                flex-direction: column;
+                gap: 10px;
+            }
+            .form-grid {
+                grid-template-columns: 1fr;
+                gap: 0;
+            }
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h2>Job Application Submission Form</h2>
+    <div id="message" class="message"></div>
+
+    <form id="submissionForm">
+
+        <div class="applicant-select">
+            <label>Applicant (Required):</label>
+            <input type="radio" id="ritikesh" name="sheetName" value="Ritikesh" required> <label for="ritikesh">Ritikesh</label>
+            <input type="radio" id="prathmesh" name="sheetName" value="Prathmesh"> <label for="prathmesh">Prathmesh</label>
+        </div>
+
+        <h3 class="section-title">Basic Information</h3>
+
+        <div class="form-grid">
+            <div class="form-group">
+                <label for="dateApplied">Date Applied (Col A):</label>
+                <input type="date" id="dateApplied" name="dateApplied" required placeholder="Select application date">
+                <span class="validation-error"></span>
+            </div>
+
+            <div class="form-group">
+                <label for="companyName">Company Name (Col B):</label>
+                <input type="text" id="companyName" name="companyName" required placeholder="e.g., Google, Microsoft">
+                <span class="validation-error"></span>
+            </div>
+
+            <div class="form-group">
+                <label for="jobTitle">Job Title (Col C):</label>
+                <input type="text" id="jobTitle" name="jobTitle" required placeholder="e.g., Software Engineer">
+                <span class="validation-error"></span>
+            </div>
+
+            <div class="form-group">
+                <label for="appStatus">Application Status (Col D):</label>
+                <select id="appStatus" name="appStatus" required>
+                    <option value="" disabled selected>Select Status</option>
+                    <option value="Applied">Applied</option>
+                    <option value="Interview Scheduled">Interview Scheduled</option>
+                    <option value="Offer Received">Offer Received</option>
+                    <option value="Rejected">Rejected</option>
+                </select>
+                <span class="validation-error"></span>
+            </div>
+
+            <div class="form-group">
+                <label for="source">Source (Col E):</label>
+                <select id="source" name="source" required>
+                    <option value="" disabled selected>Select Source</option>
+                    <option value="WhatsApp">WhatsApp</option>
+                    <option value="Telegram">Telegram</option>
+                    <option value="Job Board">Job Board</option>
+                    <option value="Company Website">Company Website</option>
+                    <option value="LinkedIn">LinkedIn</option>
+                    <option value="Other Source">Other Source</option>
+                </select>
+                <span class="validation-error"></span>
+            </div>
+
+            <div class="form-group">
+                <label for="jobLink">Job Description Link (Col F) <span class="tooltip" title="Paste the official job posting URL">ℹ️</span>:</label>
+                <input type="url" id="jobLink" name="jobLink" required placeholder="https://example.com/job-post">
+                <span class="validation-error"></span>
+            </div>
+        </div>
+
+        <h3 class="section-title">Application Details</h3>
+
+        <div class="form-grid">
+            <div class="form-group">
+                <label for="contactPerson">Contact Person/Recruiter (Col G) <span class="optional">(Optional)</span>:</label>
+                <input type="text" id="contactPerson" name="contactPerson" placeholder="e.g., John Doe">
+            </div>
+
+            <div class="form-group">
+                <label for="jobID">Job ID (if available) (Col H) <span class="optional">(Optional)</span>:</label>
+                <input type="text" id="jobID" name="jobID" placeholder="e.g., JOB12345">
+            </div>
+
+            <div class="form-group">
+                <label for="followUpDate">Follow-up Date (Col I) <span class="tooltip" title="Set a reminder date for following up">ℹ️</span>:</label>
+                <input type="date" id="followUpDate" name="followUpDate" placeholder="Select follow-up date">
+            </div>
+        </div>
+
+        <div class="form-group full-width">
+            <label for="notes">Notes/Comments (Col J):</label>
+            <textarea id="notes" name="notes"></textarea>
+        </div>
+
+        <div id="progressBar"></div>
+        <button type="submit" id="submitButton">Submit Application</button>
+    </form>
+</div>
+
+<script>
+    const form = document.getElementById('submissionForm');
+    const messageDiv = document.getElementById('message');
+    const submitButton = document.getElementById('submitButton');
+    
+    // !!! IMPORTANT: REPLACE THIS PLACEHOLDER WITH YOUR DEPLOYED APPS SCRIPT URL !!!
+    const webAppUrl = 'https://script.google.com/macros/s/AKfycbwBRyEf0L9ML-GyBBVn6_vpcCsqwyVO3sSGqCrim-oHx9oBdnu6s9Z6W2HBwt-3ySY/exec';
+
+    // Auto-fill today's date
+    document.getElementById('dateApplied').valueAsDate = new Date();
+
+    // Validation function
+    function validateForm() {
+        let isValid = true;
+        const requiredFields = form.querySelectorAll('input[required], select[required]');
+        const validationErrors = form.querySelectorAll('.validation-error');
+
+        // Hide all validation errors first
+        validationErrors.forEach(error => {
+            error.style.display = 'none';
+            error.textContent = '';
+        });
+
+        // Remove invalid class from all inputs
+        requiredFields.forEach(field => {
+            field.classList.remove('invalid');
+        });
+
+        // Check required fields
+        requiredFields.forEach(field => {
+            if (!field.value.trim()) {
+                isValid = false;
+                field.classList.add('invalid');
+                const errorSpan = field.parentElement.querySelector('.validation-error');
+                if (errorSpan) {
+                    errorSpan.textContent = 'This field is required.';
+                    errorSpan.style.display = 'block';
+                }
+            }
+        });
+
+        return isValid;
+    }
+
+    form.addEventListener('submit', function(e) {
+        e.preventDefault();
+
+        // Validate form before submission
+        if (!validateForm()) {
+            return;
+        }
+
+        // Disable button and show loading message
+        submitButton.disabled = true;
+        submitButton.innerHTML = 'Submitting <span class="spinner"></span>';
+        messageDiv.className = 'message';
+        messageDiv.textContent = 'Submitting data to Google Sheet...';
+        messageDiv.classList.add('show');
+        progressBar.style.width = '50%';
+
+        const formData = new FormData(form);
+        const data = new URLSearchParams(formData);
+
+        fetch(webAppUrl, {
+            method: 'POST',
+            body: data,
+            redirect: 'follow'
+        })
+        .then(response => {
+            if (response.ok) {
+                return response.text();
+            } else {
+                // If the Apps Script returns an HTTP error
+                throw new Error('Apps Script returned an error.');
+            }
+        })
+        .then(result => {
+            // Success handling
+            progressBar.style.width = '100%';
+            messageDiv.className = 'message success';
+            messageDiv.textContent = 'Success! Application submitted to ' + formData.get('sheetName') + ' tab.';
+
+            // Clear all fields except the Applicant selection
+            form.querySelectorAll('input:not([type="radio"]), select, textarea').forEach(field => {
+                if (field.type === 'select-one') {
+                    field.selectedIndex = 0; // Reset dropdowns
+                } else {
+                    field.value = ''; // Clear other inputs
+                }
+            });
+
+            // Hide validation errors
+            form.querySelectorAll('.validation-error').forEach(error => {
+                error.style.display = 'none';
+            });
+
+            // Re-enable button
+            submitButton.disabled = false;
+            submitButton.innerHTML = 'Submit Application';
+
+            // Hide message after a few seconds
+            setTimeout(() => {
+                messageDiv.classList.remove('show');
+                progressBar.style.width = '0';
+            }, 4000);
+        })
+        .catch(error => {
+            // Error handling
+            progressBar.style.width = '0';
+            messageDiv.className = 'message error';
+            messageDiv.textContent = 'Error during submission. Please check console for details.';
+            console.error('Submission Error:', error);
+            submitButton.disabled = false;
+            submitButton.innerHTML = 'Submit Application';
+        });
+    });
+</script>
+</body>
+</html>
